@@ -128,13 +128,12 @@
     wrappers:
         - credentials-binding:
             - text:
-                credential-id: de793dce-5821-4182-af4f-6c7b42b5c21d
+                credential-id: "{keycloak_token_creds}"
                 variable: KEYCLOAK_TOKEN
             - username-password-separated:
                 credential-id: ac51aeb0-a436-4a50-a71d-aa6f99075398
                 username: OSIO_USERNAME
                 password: OSIO_PASSWORD
-
 - job_template_defaults: &job_template_defaults
     name: 'job_template_defaults'
     description: |
@@ -1057,6 +1056,14 @@
 #            github_hooks: '{github_hooks}'
     <<: *che-functional-tests-template
 
+- job-template:
+    name: '{ci_project}-{git_repo}-prod-preview-prcheck'
+    triggers:
+        - github
+        - githubprb:
+            github_hooks: '{github_hooks}'
+    <<: *che-functional-tests-template
+
 - job:
     name: 'devtools-test-performance-core-db'
     defaults: global
@@ -1637,16 +1644,25 @@
             ci_cmd: '/bin/bash cico_run_tests.sh'
             timeout: '20m'
         - '{ci_project}-{git_repo}-periodical':
+            keycloak_token_creds: de793dce-5821-4182-af4f-6c7b42b5c21d
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh config'
             timeout: '20m'
         - '{ci_project}-{git_repo}-prcheck':
+            keycloak_token_creds: de793dce-5821-4182-af4f-6c7b42b5c21d
             git_organization: redhat-developer
             git_repo: che-functional-tests
             ci_project: 'devtools'
-            ci_cmd: '/bin/bash cico_run_EE_tests.sh'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh config'
+            timeout: '20m'
+        - '{ci_project}-{git_repo}-prod-preview-prcheck':
+            keycloak_token_creds: 1e0bbb30-cddd-4b6f-bc61-bb4ebd2706e5
+            git_organization: redhat-developer
+            git_repo: che-functional-tests
+            ci_project: 'devtools'
+            ci_cmd: '/bin/bash cico_run_EE_tests.sh config_prod_preview'
             timeout: '20m'
         - '{ci_project}-{git_repo}-build-che-credentials-{branch}':
             git_organization: redhat-developer
